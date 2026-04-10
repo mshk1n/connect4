@@ -13,10 +13,10 @@
   }
 
   
-  class Player(val symbol: String, val color: ConsoleColors)
+  case class Player(name: String, symbol: String, color: ConsoleColors)
   
-  val p1 = new Player("O", ConsoleColors.RED)
-  val p2 = new Player("O", ConsoleColors.YELLOW)
+  val p1 = new Player("Player1", "O", ConsoleColors.RED)
+  val p2 = new Player("Player2", "O", ConsoleColors.YELLOW)
   val p1Chip = p1.color(p1.symbol)
   val p2Chip = p2.color(p2.symbol)
 
