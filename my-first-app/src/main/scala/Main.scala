@@ -16,7 +16,7 @@
   class Player(val symbol: String, val color: ConsoleColors)
   
   val p1 = new Player("0", ConsoleColors.RED)
-  val p2 = new Player("*", ConsoleColors.YELLOW)
+  val p2 = new Player("O", ConsoleColors.YELLOW)
   val p1Circle = p1.color(p1.symbol)
   val p2Circle = p2.color(p2.symbol)
 
