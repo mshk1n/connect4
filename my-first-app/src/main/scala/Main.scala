@@ -15,10 +15,10 @@
   
   class Player(val symbol: String, val color: ConsoleColors)
   
-  val p1 = new Player("0", ConsoleColors.RED)
+  val p1 = new Player("O", ConsoleColors.RED)
   val p2 = new Player("O", ConsoleColors.YELLOW)
-  val p1Circle = p1.color(p1.symbol)
-  val p2Circle = p2.color(p2.symbol)
+  val p1Chip = p1.color(p1.symbol)
+  val p2Chip = p2.color(p2.symbol)
 
   val field: String =
     s"""---------------------
@@ -28,13 +28,13 @@
        |---------------------
        ||  |  |  |  |  |  |  |
        |---------------------
-       ||  |  |  |$p1Circle  |  |  |  |
+       ||  |  |  |$p1Chip  |  |  |  |
        |---------------------
-       ||  |  |$p1Circle  |  |  |  |  |
+       ||  |  |$p1Chip  |  |  |  |  |
        |---------------------
-       ||  |$p1Circle  |  |  |  |  |  |
+       ||  |$p1Chip  |  |  |  |  |  |
        |---------------------
-       ||$p1Circle |$p2Circle  |$p2Circle  |$p2Circle  |  |  |  |
+       ||$p1Chip |$p2Chip  |$p2Chip  |$p2Chip  |  |  |  |
        |---------------------
        |""".stripMargin
 
