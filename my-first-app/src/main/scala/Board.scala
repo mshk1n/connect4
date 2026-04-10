@@ -3,4 +3,4 @@ case class Board():
     val colBorder = " | "
     print(rowBorder)
     print(colBorder)
-    val mergeTest = 1
+    val mergeTest = 35
