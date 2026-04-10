@@ -1,3 +1,3 @@
 case class Board():
     val rowBorder = " --------------------- "
-    val colBorder = " | "
+    val colBorder = " / "
