@@ -1,6 +1,13 @@
 case class Board():
-    val rowBorder = " --------------------- "
+    val rowAmount = 7
+    val colAmount = 8
+
+    val rowBorder = " --------------------- \n"
     val colBorder = " | "
-    print(rowBorder)
-    print(colBorder)
+    for (i <- 0 to rowAmount) {
+        print(rowBorder)
+        for (i <- 0 to colAmount) {
+            print(colBorder)
+        }
+    }
     val mergeTest = 10
