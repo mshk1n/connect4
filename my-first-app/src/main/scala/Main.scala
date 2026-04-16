@@ -1,22 +1,23 @@
+import scala.io.StdIn.readLine
+
 @main def game(): Unit =
-  enum ConsoleColors(val code: String) {
-    case CLEAR extends ConsoleColors("\u001B[0m")
-    case RED extends ConsoleColors("\u001B[31m")
-    case GREEN extends ConsoleColors("\u001B[32m")
-    case YELLOW extends ConsoleColors("\u001B[33m")
-    case BLUE extends ConsoleColors("\u001B[34m")
-    case PURPLE extends ConsoleColors("\u001B[35m")
-    case CYAN extends ConsoleColors("\u001B[36m")
-    case WHITE extends ConsoleColors("\u001B[37m")
 
-    def apply(text: String): String = s"$code$text${CLEAR.code}"
-  }
-  
-  case class Player(name: String, symbol: String, color: ConsoleColors)
-  
-  val p1 = new Player("Player1", "O", ConsoleColors.RED)
-  val p2 = new Player("Player2", "O", ConsoleColors.YELLOW)
-  val p1Chip = p1.color(p1.symbol)
-  val p2Chip = p2.color(p2.symbol)
+  val p1 = Player("Player1", "O", ConsoleColors.RED)
+  val board = Board()
 
-  print(new Board().printBoard())
+  print(s"Welcome, ${p1.name}! Game begins now! To exit, press Ctrl+Z.\n")
+  print(board.printBoard())
+  while(true) do
+    
+    print(s"${p1.name}, choose a column (0 - 6): ")
+
+    val input = readLine()
+
+    if input == null then
+      print("\nExiting...")
+      sys.exit()
+
+    input.toIntOption match {
+      case Some(col) if col >= 0 && col <= board.cols => board.dropChip(col, p1.coloredSymbol)
+      case _ => print(ConsoleColors.RED("Error! Type a valid column number.\n"))
+    }

@@ -3,8 +3,8 @@ val scala3Version = "3.8.2"
 lazy val root = project
   .in(file("."))
   .settings(
-    name := "my-first-app",
-    version := "0.1.0-SNAPSHOT",
+    name := "connect4-game",
+    version := "0.2.0-16-4-25",
 
     scalaVersion := scala3Version,
 
