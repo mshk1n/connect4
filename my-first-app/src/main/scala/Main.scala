@@ -11,7 +11,6 @@
 
     def apply(text: String): String = s"$code$text${CLEAR.code}"
   }
-
   
   case class Player(name: String, symbol: String, color: ConsoleColors)
   
@@ -20,22 +19,4 @@
   val p1Chip = p1.color(p1.symbol)
   val p2Chip = p2.color(p2.symbol)
 
-  val field: String =
-    s"""---------------------
-       ||  |  |  |  |  |  |  |
-       |---------------------
-       ||  |  |  |  |  |  |  |
-       |---------------------
-       ||  |  |  |  |  |  |  |
-       |---------------------
-       ||  |  |  |$p1Chip  |  |  |  |
-       |---------------------
-       ||  |  |$p1Chip  |  |  |  |  |
-       |---------------------
-       ||  |$p1Chip  |  |  |  |  |  |
-       |---------------------
-       ||$p1Chip |$p2Chip  |$p2Chip  |$p2Chip  |  |  |  |
-       |---------------------
-       |""".stripMargin
-
-  print(field)
+  print(new Board().printBoard())

@@ -2,12 +2,17 @@ case class Board():
     val rowAmount = 7
     val colAmount = 8
 
-    val rowBorder = " --------------------- \n"
+    val rowBorder = " ------------------------- \n"
     val colBorder = " | "
-    for (i <- 0 to rowAmount) {
-        print(rowBorder)
-        for (i <- 0 to colAmount) {
-            print(colBorder)
+
+    def printBoard(): String = {
+        val result = new StringBuilder()
+        for (i <- 0 to rowAmount) {
+            result.append(rowBorder)
+            for (i <- 0 to colAmount) {
+                result.append(colBorder)
+            }
+            result.append("\n")
         }
+        result.toString()
     }
-    val mergeTest = 10
