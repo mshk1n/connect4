@@ -2,10 +2,12 @@ import scala.io.StdIn.readLine
 
 @main def game(): Unit =
 
-  val p1 = Player("Player1", "O", ConsoleColors.RED)
+  val p1 = Player.registerPlayer(1)
   val board = Board()
+
   print(s"Welcome, ${p1.name}! Game begins now! To exit, press Ctrl+Z.\n")
   print(board.printBoard())
+
   while(true) do
     
     print(s"${p1.name}, choose a column (0 - 6): ")
