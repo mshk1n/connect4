@@ -16,5 +16,11 @@ class PlayerSpec extends AnyWordSpec with Matchers {
         "have a color" in {
             player.color shouldBe ConsoleColors.RED
         }
+
+        "return a colored symbol" in {
+            val result = player.coloredSymbol
+            result should include("O")
+            result should startWith("\u001b")
+        }
     }
 }

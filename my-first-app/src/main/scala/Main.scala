@@ -4,7 +4,6 @@ import scala.io.StdIn.readLine
 
   val p1 = Player("Player1", "O", ConsoleColors.RED)
   val board = Board()
-
   print(s"Welcome, ${p1.name}! Game begins now! To exit, press Ctrl+Z.\n")
   print(board.printBoard())
   while(true) do
