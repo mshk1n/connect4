@@ -1,3 +1,5 @@
+package util
+
 enum ConsoleColors(val code: String) {
     case CLEAR extends ConsoleColors("\u001B[0m")
     case RED extends ConsoleColors("\u001B[31m")
