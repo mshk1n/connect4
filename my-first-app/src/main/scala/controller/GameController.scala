@@ -1,24 +1,15 @@
 package controller
 
 import model._
+import util.Observable
 
-class GameController(val board: Board):
-  //create private list of observers
-  private var observers: List[Observer] = Nil
+class GameController(val board: Board) extends Observable:
   //create private list of player
   private var players: List[Player] = Nil
   private var currentPlayerIndex = 0
 
   //player-getter
   def getPlayer: Player = players(currentPlayerIndex)
-
-  //add observers
-  def add(s: Observer): Unit =
-    observers = s :: observers
-  
-  //deliver events to observers
-  def notifyObservers(): Unit =
-    observers.foreach(_.update())
 
   //make a move
   def makeMove(col: Int): Boolean =
