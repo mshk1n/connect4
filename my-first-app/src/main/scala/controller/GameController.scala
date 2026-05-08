@@ -8,17 +8,35 @@ class GameController(val board: Board) extends Observable:
   private var players: List[Player] = Nil
   private var currentPlayerIndex = 0
 
+  var isGameOver: Boolean = false
+  var winner: Option[Player] = None
+
   //player-getter
   def getPlayer: Player = players(currentPlayerIndex)
 
   //make a move
   def makeMove(col: Int): Boolean =
+    if (isGameOver) return false //prevent moves after the game ends
+
     val player = getPlayer
-    val success = board.dropChip(col, player.coloredSymbol)
-    if (success) then
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.length  //switch to the other player
+    // Using pattern matching to handle the Option returned by Board
+    board.dropChip(col, player.coloredSymbol) match {
+      case Some(row, c) =>
+        if (board.checkWin(row, c)) {
+          isGameOver = true
+          winner = Some(player) //win
+        } else if (board.isFull) {
+          isGameOver = true
+          winner = None //draw
+        } else {
+          //no win or draw - switch to the next player
+          currentPlayerIndex = (currentPlayerIndex + 1) % players.length
+        }
         notifyObservers()
-    success
+        true
+      case None => 
+        false //move failed (column full or invalid)
+    }
   
   //creating players
   def setupPlayers(p1Data: (String, String), p2Data: (String, String)): Unit =

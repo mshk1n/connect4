@@ -12,6 +12,14 @@ class TUI(gc: GameController) extends Observer:
   //update-method from Observer
   override def update(): Unit =
     print(gc.boardToString)
+    if (gc.isGameOver) {
+      gc.winner match {
+        case Some(p) => print(s"Congratulations! ${p.name} won!")
+        case None    => print("It's a draw! Game over.")
+      }
+      println("Exiting...")
+      sys.exit()
+    }
 
   //processing an input from user
   def processInput(input: String): Unit =
@@ -23,14 +31,14 @@ class TUI(gc: GameController) extends Observer:
     input.toIntOption match {
       case Some(col) => 
         if !gc.makeMove(col) then
-          println(ConsoleColors.RED("Error! Invalid column or column is full."))
+          print(ConsoleColors.RED("Error! Invalid column or column is full."))
       case None => 
-        println(ConsoleColors.RED("Error! Please type a number."))
+        print(ConsoleColors.RED("Error! Please type a number."))
     }
   
   //registering a player
   def registerPlayer(playerNumber: Int): (String, String) = 
-    print(s"==== Register Player $playerNumber... ====")
+    print(s"==== Register Player $playerNumber... ====\n")
     val name = askForName()
     val symbol = askForSymbol(name)
     (name, symbol)
