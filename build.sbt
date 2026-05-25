@@ -12,4 +12,5 @@ lazy val root = project
       "org.scalatest" %% "scalatest" % "3.2.14" % "test",
       "org.scalameta" %% "munit" % "1.2.4" % Test
     ),
+    strykerIsSupported := true
   )
