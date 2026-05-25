@@ -23,6 +23,8 @@ jobs:
     - name: Set up SBT
       uses: sbt/setup-sbt@v1
 
-    - name: Run tests with coverage
-      run: sbt clean coverage test coverageReport
+    - name: Run tests and upload to Coveralls
+      run: sbt clean coverage test coverageReport coveralls
       working-directory: ./my-first-app
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
