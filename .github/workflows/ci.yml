@@ -29,3 +29,6 @@ jobs:
       run: sbt clean coverage test coverageReport coveralls
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Run Mutation Tests (Stryker4s)
+      run: sbt stryker
