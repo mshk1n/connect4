@@ -31,4 +31,4 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Run Mutation Tests (Stryker4s)
-      run: sbt test stryker
+      run: sbt stryker
