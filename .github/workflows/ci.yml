@@ -19,7 +19,10 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: '17'
-        cache: 'sbt'
+
+    - name: Set up SBT
+      uses: sbt/setup-sbt@v1
 
     - name: Run tests with coverage
       run: sbt clean coverage test coverageReport
+      working-directory: ./my-first-app
