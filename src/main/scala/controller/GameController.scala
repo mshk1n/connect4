@@ -27,7 +27,6 @@ class GameController(val board: Board) extends Observable:
       notifyObservers()
       result
 
-  // 2. Публичные методы для вызова Undo/Redo из интерфейса
   def undo(): Option[Unit] =
     val result = undoManager.undoStep()
     notifyObservers()
@@ -38,8 +37,6 @@ class GameController(val board: Board) extends Observable:
     notifyObservers()
     result
 
-  // 3. Внутренняя логика хода, которую дергает InsertCommand.doStep
-  // Возвращает Option[Int] (индекс строки), если ход удался
   private[controller] def executeMoveLogic(col: Int): Option[Int] =
     val player = getPlayer
     board.dropChip(col, player.coloredSymbol) match
