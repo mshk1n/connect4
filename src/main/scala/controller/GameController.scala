@@ -27,11 +27,13 @@ class GameController(val board: Board) extends Observable:
       notifyObservers()
       result
 
+  //undo a move
   def undo(): Option[Unit] =
     val result = undoManager.undoStep()
     notifyObservers()
     result
 
+  //redo a move
   def redo(): Option[Try[Unit]] =
     val result = undoManager.redoStep()
     notifyObservers()
@@ -53,7 +55,6 @@ class GameController(val board: Board) extends Observable:
       case None => 
         None
 
-  // 4. Метод отката состояния, который дергает InsertCommand.undoStep
   private[controller] def undoGameStatus(previousPlayerIndex: Int): Unit =
     isGameOver = false
     winner = None
