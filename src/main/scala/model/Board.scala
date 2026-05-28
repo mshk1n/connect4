@@ -69,3 +69,8 @@ class Board():
       val total = 1 + countInDir(row, col, dr, dc, symbol) + countInDir(row, col, -dr, -dc, symbol)
       total >= 4
     }
+  
+  //remove chip
+  def removeChip(row: Int, col: Int): Unit =
+    if (row >= 0 && row < rows && col >= 0 && col < cols) then
+      grid(row)(col) = " "

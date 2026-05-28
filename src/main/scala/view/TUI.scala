@@ -2,6 +2,7 @@ package view
 
 import controller._
 import util.ConsoleColors
+import scala.util.{Success, Failure}
 
 import scala.io.StdIn.readLine
 
@@ -17,7 +18,7 @@ class TUI(gc: GameController) extends Observer:
         case Some(p) => print(s"Congratulations! ${p.name} won!")
         case None    => print("It's a draw! Game over.")
       }
-      println("Exiting...")
+      println("\nExiting...")
       sys.exit()
     }
 
@@ -28,12 +29,34 @@ class TUI(gc: GameController) extends Observer:
       print("\nExiting...")
       sys.exit()
 
-    input.toIntOption match {
-      case Some(col) => 
-        if !gc.makeMove(col) then
-          print(ConsoleColors.RED("Error! Invalid column or column is full."))
-      case None => 
-        print(ConsoleColors.RED("Error! Please type a number."))
+    input.trim.toLowerCase match {
+      //undo-button
+      case "z" => 
+        gc.undo() match {
+          case Some(_) => println("Undo successful.")
+          case None => print(ConsoleColors.RED("Nothing to undo!\n"))
+        }
+
+      //redo-button
+      case "y" => 
+        gc.redo() match {
+          case Some(Success(_)) => println("Redo successful.")
+          case Some(Failure(ex)) => print(ConsoleColors.RED(s"Error on redo: ${ex.getMessage}\n"))
+          case None => print(ConsoleColors.RED("Nothing to redo!\n"))
+        }
+
+      //any other button
+      case other => 
+        other.toIntOption match {
+          case Some(col) => 
+            gc.makeMove(col) match {
+              case Success(_) => 
+              case Failure(exception) => 
+                print(ConsoleColors.RED(s"Error! ${exception.getMessage}\n"))
+            }
+          case None => 
+            print(ConsoleColors.RED("Error! Please type a number, 'z' (undo), or 'y' (redo).\n"))
+        }
     }
   
   //registering a player

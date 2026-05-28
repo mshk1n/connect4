@@ -1,12 +1,13 @@
 package controller
 
 import model._
-import util.Observable
+import util.{Observable, UndoManager}
+import scala.util.{Try, Success, Failure}
 
 class GameController(val board: Board) extends Observable:
   //create private list of player
   private var players: List[Player] = Nil
-  private var currentPlayerIndex = 0
+  private[controller] var currentPlayerIndex = 0
 
   var isGameOver: Boolean = false
   var winner: Option[Player] = None
@@ -14,29 +15,52 @@ class GameController(val board: Board) extends Observable:
   //player-getter
   def getPlayer: Player = players(currentPlayerIndex)
 
-  //make a move
-  def makeMove(col: Int): Boolean =
-    if (isGameOver) return false //prevent moves after the game ends
+  //undoManager
+  private val undoManager = new UndoManager
 
+  //make a move
+  def makeMove(col: Int): Try[Unit] =
+    if (isGameOver) then
+      Failure(new IllegalStateException("Game is already over!"))
+    else
+      val result = undoManager.doStep(new InsertCommand(this, col))
+      notifyObservers()
+      result
+
+  // 2. Публичные методы для вызова Undo/Redo из интерфейса
+  def undo(): Option[Unit] =
+    val result = undoManager.undoStep()
+    notifyObservers()
+    result
+
+  def redo(): Option[Try[Unit]] =
+    val result = undoManager.redoStep()
+    notifyObservers()
+    result
+
+  // 3. Внутренняя логика хода, которую дергает InsertCommand.doStep
+  // Возвращает Option[Int] (индекс строки), если ход удался
+  private[controller] def executeMoveLogic(col: Int): Option[Int] =
     val player = getPlayer
-    // Using pattern matching to handle the Option returned by Board
-    board.dropChip(col, player.coloredSymbol) match {
+    board.dropChip(col, player.coloredSymbol) match
       case Some(row, c) =>
-        if (board.checkWin(row, c)) {
+        if (board.checkWin(row, c)) then
           isGameOver = true
-          winner = Some(player) //win
-        } else if (board.isFull) {
+          winner = Some(player)
+        else if (board.isFull) then
           isGameOver = true
-          winner = None //draw
-        } else {
-          //no win or draw - switch to the next player
+          winner = None
+        else
           currentPlayerIndex = (currentPlayerIndex + 1) % players.length
-        }
-        notifyObservers()
-        true
+        Some(row)
       case None => 
-        false //move failed (column full or invalid)
-    }
+        None
+
+  // 4. Метод отката состояния, который дергает InsertCommand.undoStep
+  private[controller] def undoGameStatus(previousPlayerIndex: Int): Unit =
+    isGameOver = false
+    winner = None
+    currentPlayerIndex = previousPlayerIndex
   
   //creating players
   def setupPlayers(p1Data: (String, String), p2Data: (String, String)): Unit =
