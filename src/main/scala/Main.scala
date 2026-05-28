@@ -4,6 +4,7 @@ import model.Board
 import controller.GameController
 import view.TUI
 import scala.io.StdIn.readLine
+import scala.annotation.tailrec
 
 @main def run(): Unit =
   //component initialisation
@@ -18,10 +19,15 @@ import scala.io.StdIn.readLine
 
   println("\n--- Game Started! ---")
   println(controller.boardToString)
+  gameLoop(controller, tui)
 
-  while true do
+  @tailrec
+  def gameLoop(controller: GameController, tui: TUI): Unit =
+  if (!controller.isGameOver) then
     val player = controller.getPlayer
     print(s"\n${player.name}'s turn (${player.symbol}) > ")
     
     val input = readLine()
     tui.processInput(input)
+    
+    gameLoop(controller, tui)

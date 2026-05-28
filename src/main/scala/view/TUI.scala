@@ -15,11 +15,10 @@ class TUI(gc: GameController) extends Observer:
     print(gc.boardToString)
     if (gc.isGameOver) {
       gc.winner match {
-        case Some(p) => print(s"Congratulations! ${p.name} won!")
-        case None    => print("It's a draw! Game over.")
+        case Some(p) => println(s"\nCongratulations! ${p.name} won!")
+        case None    => println("\nIt's a draw! Game over.")
       }
-      println("\nExiting...")
-      sys.exit()
+      println("Exiting...") // Изящный финал без sys.exit()
     }
 
   //processing an input from user

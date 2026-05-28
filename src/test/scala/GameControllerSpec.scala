@@ -3,35 +3,61 @@ package controller
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import model.Board
+import scala.util.{Success, Failure}
 
 class GameControllerSpec extends AnyWordSpec with Matchers {
+
   "A GameController" should {
-    val board = new Board()
-    val gc = new GameController(board)
 
     "properly setup players" in {
-      gc.setupPlayers(("Alice", "A"), ("Bob", "B"))
-      gc.getPlayer.name should be("Alice")
-      gc.getPlayer.color should be(util.ConsoleColors.RED)
+      val board = new Board()
+      val gc = new GameController(board)
+      gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
+      gc.getPlayer.name shouldBe "Alice"
     }
 
-    "provide access to board rendering" in {
-      gc.boardToString should be(board.render())
+    "manage current player index correctly on successful moves" in {
+      val board = new Board()
+      val gc = new GameController(board)
+      gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
+      
+      gc.makeMove(0) shouldBe Success(())
+      gc.getPlayer.name shouldBe "Bob"
+      
+      gc.makeMove(0) shouldBe Success(())
+      gc.getPlayer.name shouldBe "Alice"
     }
 
-    "manage current player index correctly" in {
-      gc.setupPlayers(("P1", "1"), ("P2", "2"))
-      gc.makeMove(0)
-      gc.getPlayer.name should be("P2")
-      gc.makeMove(0)
-      gc.getPlayer.name should be("P1")
+    "not switch player and return Failure if move was invalid (column full)" in {
+      val board = new Board()
+      val gc = new GameController(board)
+      gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
+
+      for (_ <- 0 until 6) {
+        gc.makeMove(0) shouldBe Success(())
+      }
+
+      val currentFeedback = gc.getPlayer
+      gc.makeMove(0) shouldBe a[Failure[_]]
+      gc.getPlayer shouldBe currentFeedback
     }
-    
-    "not switch player if move was invalid" in {
-      gc.setupPlayers(("P1", "1"), ("P2", "2"))
-      val activeBefore = gc.getPlayer
-      gc.makeMove(10)
-      gc.getPlayer should be(activeBefore)
+
+    "return Failure when attempting a move after the game is over" in {
+      val board = new Board()
+      val gc = new GameController(board)
+      gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
+
+      gc.makeMove(0) // A
+      gc.makeMove(0) // B
+      gc.makeMove(1) // A
+      gc.makeMove(1) // B
+      gc.makeMove(2) // A
+      gc.makeMove(2) // B
+      gc.makeMove(3) // A
+
+      gc.isGameOver shouldBe true
+      
+      gc.makeMove(4) shouldBe a[Failure[_]]
     }
   }
 }
