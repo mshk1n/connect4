@@ -38,7 +38,7 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
       }
 
       val currentFeedback = gc.getPlayer
-      gc.makeMove(0) shouldBe a[Failure[_]]
+      gc.makeMove(0) shouldBe a[Failure[?]]
       gc.getPlayer shouldBe currentFeedback
     }
 
@@ -57,7 +57,7 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
 
       gc.isGameOver shouldBe true
       
-      gc.makeMove(4) shouldBe a[Failure[_]]
+      gc.makeMove(4) shouldBe a[Failure[?]]
     }
   }
 }

@@ -18,7 +18,7 @@ class TUI(gc: GameController) extends Observer:
         case Some(p) => println(s"\nCongratulations! ${p.name} won!")
         case None    => println("\nIt's a draw! Game over.")
       }
-      println("Exiting...") // Изящный финал без sys.exit()
+      println("Exiting...")
     }
 
   //processing an input from user
