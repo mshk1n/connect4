@@ -62,8 +62,10 @@ class TUI(gc: GameController) extends Observer:
   def registerPlayer(playerNumber: Int): (String, String) = 
     print(s"==== Register Player $playerNumber... ====\n")
     val name = askForName()
-    val symbol = askForSymbol(name)
-    (name, symbol)
+    if (playerNumber == 0)
+      (name, "X")
+    else
+      (name, "O")
 
   //processing name input
   private def askForName(): String =
@@ -74,16 +76,3 @@ class TUI(gc: GameController) extends Observer:
       askForName()
     else
       nameInput
-
-  //processing chip input
-  private def askForSymbol(name: String): String =
-    print(s"Now, $name, enter your symbol: ")
-    val chipInput = readLine()
-    if chipInput == null then
-      print(ConsoleColors.RED("Error! Chip cannot be empty! Try again: \n"))
-      askForSymbol(name)
-    else if chipInput.length() != 1 then
-      print(ConsoleColors.RED("Error! Chip must contain only 1 symbol! Try again: \n"))
-      askForSymbol(name)
-    else
-      chipInput

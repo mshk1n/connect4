@@ -15,6 +15,9 @@ class GameController(val board: Board) extends Observable:
   //player-getter
   def getPlayer: Player = players(currentPlayerIndex)
 
+  //playerSymbol-getter
+  def getPlayerColoredSymbol(index: Int): String = players(index).coloredSymbol
+
   //undoManager
   private val undoManager = new UndoManager
 
