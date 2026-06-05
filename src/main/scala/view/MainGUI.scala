@@ -25,12 +25,18 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
       timerLabel.text = f"Time - $mins%02d:$secs%02d"
     }
   })
+  val turnLabel = new Label() {
+    font = new java.awt.Font("Arial", java.awt.Font.BOLD, 14)
+  }
 
   val titleLabel = new Label("Welcome to Connect 4!")
   val player1Field = new TextField { columns = 15; preferredSize = new java.awt.Dimension(180, 26) }
   val vsLabel = new Label("==== VS ====")
   val player2Field = new TextField { columns = 15; preferredSize = new java.awt.Dimension(180, 26) }
   val playButton = new Button("PLAY") { preferredSize = new java.awt.Dimension(100, 35) }
+
+  val undoButton = new Button("UNDO") { preferredSize = new java.awt.Dimension(80, 25) }
+  val redoButton = new Button("REDO") { preferredSize = new java.awt.Dimension(80, 25) }
 
   contents = new BoxPanel(Orientation.Vertical) {
     border = Swing.EmptyBorder(15, 15, 15, 15)
@@ -49,7 +55,7 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
     contents += new FlowPanel(playButton)
   }
 
-  listenTo(playButton)
+  listenTo(playButton, undoButton, redoButton)
   reactions += {
     case ButtonClicked(`playButton`) =>
       if (player1Field.text.trim.isEmpty || player2Field.text.trim.isEmpty) then
@@ -64,11 +70,25 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
         print("[DEBUG] Game Started!")
         startGameUI()
       print("[DEBUG] PLAY clicked!")
+    
+    case ButtonClicked(`undoButton`) =>
+      controller.undo() match {
+        case Some(_) => print("[DEBUG] Undo successful")
+        case None    => print("[DEBUG] Nothing to undo")
+      }
+
+    case ButtonClicked(`redoButton`) =>
+      controller.redo() match {
+        case Some(Success(_))  => print("[DEBUG] Redo successful")
+        case Some(Failure(ex)) => print(s"[DEBUG] Redo failed: ${ex.getMessage}")
+        case None              => print("[DEBUG] Nothing to redo")
+      } 
   }
 
   
   def startGameUI(): Unit = {
     this.preferredSize = new java.awt.Dimension(600, 550)
+    turnLabel.text = s"${controller.getPlayer.name}'s move >>> "
     val gridPanel = new GridPanel(6, 7) {
       hGap = 5
       vGap = 5
@@ -89,7 +109,7 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
                     messageType = Dialog.Message.Warning
                   )
                 case Success(_) =>
-                  print(s"[DEBUG] Moved to column $col")
+                  print(s"[DEBUG] Moved to column $col\n")
               }
             }
           }
@@ -100,7 +120,15 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
     }
 
     val mainGamePanel = new BorderPanel {
-      layout(new FlowPanel(timerLabel)) = BorderPanel.Position.North
+      layout(new FlowPanel {
+        contents += timerLabel
+        contents += Swing.HStrut(30)
+        contents += turnLabel
+        contents += Swing.HStrut(30)
+        contents += undoButton
+        contents += Swing.HStrut(5)
+        contents += redoButton
+      }) = BorderPanel.Position.North
       layout(gridPanel) = BorderPanel.Position.Center
     }
 
@@ -116,6 +144,8 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
   override def update(): Unit = {
     val p1Symbol = controller.getPlayerColoredSymbol(0)
     val p2Symbol = controller.getPlayerColoredSymbol(1)
+    val currentPlayer = controller.getPlayer
+    turnLabel.text = s"${currentPlayer.name}'s move >>> "
 
     for (row <- 0 until 6) {
       for (col <- 0 until 7) {
@@ -134,7 +164,6 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
             button.background = java.awt.Color.YELLOW
             button.focusPainted = false
             button.borderPainted = false
-          case _ =>
         }
       }
     }
