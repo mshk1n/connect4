@@ -5,71 +5,69 @@ import util.{Observable, UndoManager}
 import scala.util.{Try, Success, Failure}
 
 class GameController(val board: Board) extends Observable:
-  //create private list of player
-  private var players: List[Player] = Nil
-  private[controller] var currentPlayerIndex = 0
-
-  var isGameOver: Boolean = false
-  var winner: Option[Player] = None
-
-  //player-getter
-  def getPlayer: Player = players(currentPlayerIndex)
-
-  //playerSymbol-getter
-  def getPlayerColoredSymbol(index: Int): String = players(index).coloredSymbol
-
-  //undoManager
+  private[controller] var players: List[Player] = Nil
+  private val playerFactory: util.PlayerFactory = new util.HumanPlayerFactory
+  private var winStrategy: util.WinStrategy = new util.ConnectNStrategy(4)
+  private var currentState: GameState = new InitializationState(this)
   private val undoManager = new UndoManager
 
-  //make a move
-  def makeMove(col: Int): Try[Unit] =
-    if (isGameOver) then
-      Failure(new IllegalStateException("Game is already over!"))
-    else
-      val result = undoManager.doStep(new InsertCommand(this, col))
-      notifyObservers()
-      result
+  def getWinStrategy: util.WinStrategy = winStrategy
 
-  //undo a move
-  def undo(): Option[Unit] =
-    val result = undoManager.undoStep()
-    notifyObservers()
-    result
+  def setWinCount(n: Int): Unit =
+    winStrategy = new util.ConnectNStrategy(n)
 
-  //redo a move
-  def redo(): Option[Try[Unit]] =
-    val result = undoManager.redoStep()
-    notifyObservers()
-    result
+  private[controller] def changeState(state: GameState): Unit =
+    currentState = state
 
-  private[controller] def executeMoveLogic(col: Int): Option[Int] =
-    val player = getPlayer
-    board.dropChip(col, player.coloredSymbol) match
-      case Some(row, c) =>
-        if (board.checkWin(row, c)) then
-          isGameOver = true
-          winner = Some(player)
-        else if (board.isFull) then
-          isGameOver = true
-          winner = None
-        else
-          currentPlayerIndex = (currentPlayerIndex + 1) % players.length
-        Some(row)
-      case None => 
-        None
+  private[controller] def getCurrentState: GameState = currentState
 
-  private[controller] def undoGameStatus(previousPlayerIndex: Int): Unit =
-    isGameOver = false
-    winner = None
-    currentPlayerIndex = previousPlayerIndex
+  def isGameOver: Boolean = currentState.isInstanceOf[GameOverState]
   
-  //creating players
+  def winner: Option[Player] = currentState match
+    case go: GameOverState => go.winner
+    case _ => None
+
+  def getPlayer: Player = currentState.currentPlayer match
+    case Some(p) => p
+    case None    => Player("Unknown", "?")
+
+  def getPlayerSymbol(index: Int): String = players(index).symbol
+
   def setupPlayers(p1Data: (String, String), p2Data: (String, String)): Unit =
     players = List(
-      Player(p1Data._1, p1Data._2, util.ConsoleColors.RED),
-      Player(p2Data._1, p2Data._2, util.ConsoleColors.YELLOW)
+      playerFactory.createPlayer(p1Data._1, p1Data._2),
+      playerFactory.createPlayer(p2Data._1, p2Data._2)
     )
+    changeState(new PlayerTurnState(this, 0))
 
-  //toString
+  def makeMove(col: Int): Try[Unit] =
+    val command = new InsertCommand(this, col)
+    val result = undoManager.doStep(command)
+    if (result.isSuccess) 
+      notifyObservers()
+    result
+
+  private[controller] def executeMoveLogic(col: Int): Option[(Int, Int)] =
+    val player = getPlayer
+    board.dropChip(col, player.symbol) match
+      case Some(actualRow, actualCol) => Some((actualRow, actualCol))
+      case None                       => None
+
+  private[controller] def getPlacedRowOfColumn(col: Int): Option[Int] =
+    (0 until 6).find(r => board.getCell(r, col) != " ") 
+
+  private[controller] def undoGameStatus(previousState: GameState): Unit =
+    currentState = previousState
+
+  def undo(): Try[Unit] =
+    val result = undoManager.undoStep()
+    if (result.isSuccess) notifyObservers()
+    result
+
+  def redo(): Try[Unit] =
+    val result = undoManager.redoStep()
+    if (result.isSuccess) notifyObservers()
+    result
+
   def boardToString: String =
     board.render()

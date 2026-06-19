@@ -3,7 +3,6 @@ package view
 import controller._
 import util.ConsoleColors
 import scala.util.{Success, Failure}
-
 import scala.io.StdIn.readLine
 
 class TUI(gc: GameController) extends Observer:
@@ -32,16 +31,15 @@ class TUI(gc: GameController) extends Observer:
       //undo-button
       case "z" => 
         gc.undo() match {
-          case Some(_) => println("Undo successful.")
-          case None => print(ConsoleColors.RED("Nothing to undo!\n"))
+          case Success(_) => println("Undo successful.")
+          case Failure(ex) => print(ConsoleColors.RED(s"Cannot undo: ${ex.getMessage}"))
         }
 
       //redo-button
       case "y" => 
         gc.redo() match {
-          case Some(Success(_)) => println("Redo successful.")
-          case Some(Failure(ex)) => print(ConsoleColors.RED(s"Error on redo: ${ex.getMessage}\n"))
-          case None => print(ConsoleColors.RED("Nothing to redo!\n"))
+          case Success(_) => println("Redo successful.")
+          case Failure(ex) => print(ConsoleColors.RED(s"Cannot redo: ${ex.getMessage}\n"))
         }
 
       //any other button

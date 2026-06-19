@@ -4,27 +4,27 @@ import util.Command
 import scala.util.{Try, Success, Failure}
 
 class InsertCommand(controller: GameController, col: Int) extends Command:
-  //save coordinates in case of remove command
   private var placedRow: Option[Int] = None
-  
-  //save current player's index
-  private var savedPlayerIndex: Int = controller.currentPlayerIndex
+  private var savedState: GameState = controller.getCurrentState
 
   override def doStep(): Try[Unit] =
-    controller.executeMoveLogic(col) match
+    controller.getCurrentState.makeMove(col) match
+      case Success(()) =>
+        placedRow = controller.getPlacedRowOfColumn(col)
+        Success(())
+      case Failure(ex) =>
+        Failure(ex)
+
+  override def undoStep(): Try[Unit] =
+    placedRow match
       case Some(row) =>
-        placedRow = Some(row) //save row
+        controller.board.removeChip(row, col)
+        controller.undoGameStatus(savedState)
+        placedRow = None
         Success(())
       case None =>
-        //column is full or wrong number
-        Failure(new IllegalArgumentException(s"Column $col is full or invalid!"))
-
-  override def undoStep(): Unit =
-    placedRow.foreach { row =>
-      controller.board.removeChip(row, col)
-      controller.undoGameStatus(savedPlayerIndex)
-      placedRow = None
-    }
+        Failure(new IllegalStateException("No move to undo!"))
 
   override def redoStep(): Try[Unit] =
+    savedState = controller.getCurrentState
     doStep()

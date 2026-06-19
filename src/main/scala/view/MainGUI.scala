@@ -2,7 +2,7 @@ package view
 
 import controller._
 import swing._
-import scala.swing.event.ButtonClicked
+import scala.swing.event._
 import scala.util.{Success, Failure}
 import java.awt.event.ActionEvent
 
@@ -10,8 +10,8 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
   controller.add(this)
   val cells = Array.ofDim[Button](6, 7)
 
-  title = "Connect 4"
-  preferredSize = new java.awt.Dimension(400, 300)
+  title = "Connect X"
+  preferredSize = new java.awt.Dimension(400, 400)
 
   var secondsElapsed = 0
   val timerLabel = new Label("Time - 00:00") {
@@ -29,10 +29,24 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
     font = new java.awt.Font("Arial", java.awt.Font.BOLD, 14)
   }
 
-  val titleLabel = new Label("Welcome to Connect 4!")
+  val titleLabel = new Label("Welcome to Connect X!")
   val player1Field = new TextField { columns = 15; preferredSize = new java.awt.Dimension(180, 26) }
   val vsLabel = new Label("==== VS ====")
   val player2Field = new TextField { columns = 15; preferredSize = new java.awt.Dimension(180, 26) }
+
+  val modeLabel = new Label("Choose playing mode:")
+  val radio3 = new RadioButton("Connect 3")
+  val radio4 = new RadioButton("Connect 4") { selected = true }
+  val radio5 = new RadioButton("Connect 5")
+  val modeGroup = new ButtonGroup(radio3, radio4, radio5)
+
+  val optionsPanel = new BoxPanel(Orientation.Horizontal) {
+    contents += modeLabel
+    contents += radio3
+    contents += radio4
+    contents += radio5
+  }
+
   val playButton = new Button("PLAY") { preferredSize = new java.awt.Dimension(100, 35) }
 
   val undoButton = new Button("UNDO") { preferredSize = new java.awt.Dimension(80, 25) }
@@ -52,10 +66,14 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
     contents += new FlowPanel(new Label("Player 2 Name:"))
     contents += new FlowPanel(player2Field)
     contents += Swing.VStrut(10)
+    contents += new FlowPanel(modeLabel)
+    contents += Swing.VStrut(5)
+    contents += optionsPanel
+    contents += Swing.VStrut(10)
     contents += new FlowPanel(playButton)
   }
 
-  listenTo(playButton, undoButton, redoButton)
+  listenTo(playButton, undoButton, redoButton, radio3, radio4, radio5)
   reactions += {
     case ButtonClicked(`playButton`) =>
       if (player1Field.text.trim.isEmpty || player2Field.text.trim.isEmpty) then
@@ -66,6 +84,12 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
             messageType = Dialog.Message.Error,
         )
       else
+        if (radio3.selected)
+          controller.setWinCount(3)
+        else if (radio5.selected)
+          controller.setWinCount(5)
+        else
+          controller.setWinCount(4)
         controller.setupPlayers((player1Field.text, "X"), (player2Field.text, "O"))
         print("[DEBUG] Game Started!")
         startGameUI()
@@ -73,21 +97,24 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
     
     case ButtonClicked(`undoButton`) =>
       controller.undo() match {
-        case Some(_) => print("[DEBUG] Undo successful")
-        case None    => print("[DEBUG] Nothing to undo")
+        case Success(_) => print("[DEBUG] Undo successful")
+        case Failure(ex) => 
+          Dialog.showMessage(parent = this, message = ex.getMessage, title = "Notice")
+          print(s"[DEBUG] Undo failed! ${ex.getMessage()}")
       }
 
     case ButtonClicked(`redoButton`) =>
       controller.redo() match {
-        case Some(Success(_))  => print("[DEBUG] Redo successful")
-        case Some(Failure(ex)) => print(s"[DEBUG] Redo failed: ${ex.getMessage}")
-        case None              => print("[DEBUG] Nothing to redo")
+        case Success(_)  => print("[DEBUG] Redo successful")
+        case Failure(ex) => 
+          Dialog.showMessage(parent = this, message = ex.getMessage, title = "Notice")
+          print(s"[DEBUG] Redo failed! ${ex.getMessage()}")
       } 
   }
 
   
   def startGameUI(): Unit = {
-    this.preferredSize = new java.awt.Dimension(600, 550)
+    this.preferredSize = new java.awt.Dimension(700, 550)
     turnLabel.text = s"${controller.getPlayer.name}'s move >>> "
     val gridPanel = new GridPanel(6, 7) {
       hGap = 5
@@ -121,6 +148,13 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
 
     val mainGamePanel = new BorderPanel {
       layout(new FlowPanel {
+        if (radio3.selected)
+          contents += new Label("Current mode: 3 IN A ROW")
+        else if (radio5.selected)
+          contents += new Label("Current mode: 5 IN A ROW")
+        else
+          contents += new Label("Current mode: 4 IN A ROW")
+        contents += Swing.HStrut(30)
         contents += timerLabel
         contents += Swing.HStrut(30)
         contents += turnLabel
@@ -142,8 +176,8 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
   this.centerOnScreen()
 
   override def update(): Unit = {
-    val p1Symbol = controller.getPlayerColoredSymbol(0)
-    val p2Symbol = controller.getPlayerColoredSymbol(1)
+    val p1Symbol = controller.getPlayerSymbol(0)
+    val p2Symbol = controller.getPlayerSymbol(1)
     val currentPlayer = controller.getPlayer
     turnLabel.text = s"${currentPlayer.name}'s move >>> "
 

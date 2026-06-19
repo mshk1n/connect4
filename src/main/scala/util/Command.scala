@@ -4,7 +4,7 @@ import scala.util.{Try, Success, Failure}
 
 trait Command:
   def doStep(): Try[Unit]
-  def undoStep(): Unit
+  def undoStep(): Try[Unit]
   def redoStep(): Try[Unit]
 
 class UndoManager:
@@ -20,23 +20,28 @@ class UndoManager:
       case Failure(ex) => 
         Failure(ex)
 
-  def undoStep(): Option[Unit] =
+  def undoStep(): Try[Unit] =
     undoStack match
-      case Nil => None
+      case Nil => 
+        Failure(new IllegalStateException("Nothing to undo!"))
       case head :: stack =>
-        head.undoStep()
-        undoStack = stack
-        redoStack = head :: redoStack
-        Some(())
+        head.undoStep() match
+          case Success(_) =>
+            undoStack = stack
+            redoStack = head :: redoStack
+            Success(())
+          case Failure(ex) => 
+            Failure(ex)
 
-  def redoStep(): Option[Try[Unit]] =
+  def redoStep(): Try[Unit] =
     redoStack match
-      case Nil => None
+      case Nil => 
+        Failure(new IllegalStateException("Nothing to redo!"))
       case head :: stack =>
         head.redoStep() match
           case Success(_) =>
             redoStack = stack
             undoStack = head :: undoStack
-            Some(Success(()))
+            Success(())
           case Failure(ex) => 
-            Some(Failure(ex))
+            Failure(ex)
