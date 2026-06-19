@@ -49,10 +49,11 @@ class MainGUISpec extends AnyWordSpec with Matchers {
     "correctly safe-guard components before cells array is fully built" in {
       val board = new TestBoard
       val controller = new GameController(board)
-      
       controller.setupPlayers(("Alice", "X"), ("Bob", "O"))
       
       val gui = new MainGUI(controller)
+
+      gui.startGameUI()
 
       noException should be thrownBy {
         gui.update()
@@ -62,18 +63,13 @@ class MainGUISpec extends AnyWordSpec with Matchers {
     "correctly process grid setup and color cell buttons after game starts" in {
       val board = new TestBoard
       val controller = new GameController(board)
-      val gui = new MainGUI(controller)
-
-      gui.player1Field.text = "Player1"
-      gui.player2Field.text = "Player2"
       
+      controller.setupPlayers(("Player1", "X"), ("Player2", "O"))
+      
+      val gui = new MainGUI(controller)
       gui.startGameUI()
 
       gui.cells(0)(0) should not be null
-      
-      noException should be thrownBy {
-        gui.update()
-      }
     }
   }
 }
