@@ -13,7 +13,5 @@ lazy val root = project
       "org.scalameta" %% "munit" % "1.2.4" % Test,
       "org.scala-lang.modules" %% "scala-swing" % "3.0.0"
     ),
-    strykerIsSupported := true,
-    Test / javaOptions += "-Djava.awt.headless=true",
-    Test / fork := true
+    strykerIsSupported := true
   )
