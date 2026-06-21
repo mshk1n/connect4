@@ -3,6 +3,7 @@ package controller
 import model._
 import util.{Observable, UndoManager}
 import scala.util.{Try, Success, Failure}
+import com.google.inject.Inject
 
 trait GameControllerInterface extends Observable:
   def getWinStrategy: util.WinStrategy
@@ -19,7 +20,7 @@ trait GameControllerInterface extends Observable:
 
   def getBoard: model.BoardInterface
 
-private[controller ]class GameController(val board: BoardInterface) extends GameControllerInterface:
+class GameController @Inject() (val board: BoardInterface) extends GameControllerInterface:
   private[controller] var players: List[Player] = Nil
   private val playerFactory: util.PlayerFactory = new util.HumanPlayerFactory
   private var winStrategy: util.WinStrategy = new util.ConnectNStrategy(4)

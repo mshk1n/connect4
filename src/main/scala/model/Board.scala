@@ -7,7 +7,7 @@ trait BoardInterface:
   def isFull: Boolean
   def removeChip(row: Int, col: Int): Unit
 
-private[model] class Board() extends BoardInterface:
+class Board() extends BoardInterface:
   val rows = 6
   val cols = 7
   
