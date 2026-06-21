@@ -8,10 +8,10 @@ import java.io.ByteArrayOutputStream
 
 class TUISpec extends AnyWordSpec with Matchers {
   "A TUI" should {
-    val board = new Board()
-    val controller = new GameController(board)
-    controller.setupPlayers(("P1", "X"), ("P2", "O"))
-    val tui = new TUI(controller)
+    val board = model.BoardFactory.createBoard()
+    val gc = controller.GameControllerFactory.createControlller(board)
+    gc.setupPlayers(("P1", "X"), ("P2", "O"))
+    val tui = new TUI(gc)
 
     "update when the controller changes" in {
       val out = new ByteArrayOutputStream()
@@ -22,7 +22,7 @@ class TUISpec extends AnyWordSpec with Matchers {
     }
 
     "handle valid input" in {
-      controller.makeMove(0)
+      gc.makeMove(0)
       tui.processInput("1") 
       board.getCell(5, 1) should not be (" ")
     }

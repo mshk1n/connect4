@@ -4,7 +4,22 @@ import model._
 import util.{Observable, UndoManager}
 import scala.util.{Try, Success, Failure}
 
-class GameController(val board: Board) extends Observable:
+trait GameControllerInterface extends Observable:
+  def getWinStrategy: util.WinStrategy
+  def setWinCount(n: Int): Unit
+  def isGameOver: Boolean
+  def winner: Option[Player]
+  def getPlayer: Player
+  def getPlayerSymbol(index: Int): String
+  def setupPlayers(p1Data: (String, String), p2Data: (String, String)): Unit
+  def makeMove(col: Int): Try[Unit]
+  def undo(): Try[Unit]
+  def redo(): Try[Unit]
+  def boardToString: String
+
+  def getBoard: model.BoardInterface
+
+private[controller ]class GameController(val board: BoardInterface) extends GameControllerInterface:
   private[controller] var players: List[Player] = Nil
   private val playerFactory: util.PlayerFactory = new util.HumanPlayerFactory
   private var winStrategy: util.WinStrategy = new util.ConnectNStrategy(4)
@@ -15,6 +30,8 @@ class GameController(val board: Board) extends Observable:
 
   def setWinCount(n: Int): Unit =
     winStrategy = new util.ConnectNStrategy(n)
+
+  def getBoard: model.BoardInterface = board
 
   private[controller] def changeState(state: GameState): Unit =
     currentState = state
@@ -71,3 +88,6 @@ class GameController(val board: Board) extends Observable:
 
   def boardToString: String =
     board.render()
+
+object GameControllerFactory:
+  def createControlller(board: BoardInterface): GameControllerInterface = new GameController(board)

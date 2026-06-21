@@ -10,14 +10,14 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
   "A GameController" should {
 
     "properly setup players" in {
-      val board = new Board()
+      val board = model.BoardFactory.createBoard()
       val gc = new GameController(board)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
       gc.getPlayer.name shouldBe "Alice"
     }
 
     "manage current player index correctly on successful moves" in {
-      val board = new Board()
+      val board = model.BoardFactory.createBoard()
       val gc = new GameController(board)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
       
@@ -29,7 +29,7 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
     }
 
     "not switch player and return Failure if move was invalid (column full)" in {
-      val board = new Board()
+      val board = model.BoardFactory.createBoard()
       val gc = new GameController(board)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
 
@@ -43,7 +43,7 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
     }
 
     "return Failure when attempting a move after the game is over" in {
-      val board = new Board()
+      val board = model.BoardFactory.createBoard()
       val gc = new GameController(board)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
 

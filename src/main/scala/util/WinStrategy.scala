@@ -1,12 +1,12 @@
 package util
 
-import model.Board
+import model.BoardInterface
 
 trait WinStrategy:
-    def checkWin(board: Board, row: Int, col: Int): Boolean
+    def checkWin(board: BoardInterface, row: Int, col: Int): Boolean
 
 class ConnectNStrategy(winCount: Int) extends WinStrategy:
-    override def checkWin(board: Board, row: Int, col: Int): Boolean =
+    override def checkWin(board: BoardInterface, row: Int, col: Int): Boolean =
         val symbol = board.getCell(row, col)
         if (symbol == " ") 
           return false
@@ -27,7 +27,7 @@ class ConnectNStrategy(winCount: Int) extends WinStrategy:
         }
 
         //counting matching symbols in a direction
-    private def countInDir(board: Board, r: Int, c: Int, dr: Int, dc: Int, symbol: String): Int =
+    private def countInDir(board: BoardInterface, r: Int, c: Int, dr: Int, dc: Int, symbol: String): Int =
         val nextR = r + dr  //coordinate r (row) + step dr
         val nextC = c + dc  //coordinate c (column) + step dc
     

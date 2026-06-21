@@ -1,6 +1,13 @@
 package model
 
-class Board():
+trait BoardInterface:
+  def render(): String
+  def getCell(row: Int, col: Int): String
+  def dropChip(col: Int, symbol: String): Option[(Int, Int)]
+  def isFull: Boolean
+  def removeChip(row: Int, col: Int): Unit
+
+private[model] class Board() extends BoardInterface:
   val rows = 6
   val cols = 7
   
@@ -41,3 +48,6 @@ class Board():
   def removeChip(row: Int, col: Int): Unit =
     if (row >= 0 && row < rows && col >= 0 && col < cols) then
       grid(row)(col) = " "
+
+object BoardFactory:
+  def createBoard(): BoardInterface = new Board()

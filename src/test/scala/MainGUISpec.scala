@@ -5,10 +5,11 @@ import org.scalatest.matchers.should.Matchers
 import controller.GameController
 import model.Board
 import scala.swing.event.ButtonClicked
+import model.BoardInterface
 
 class MainGUISpec extends AnyWordSpec with Matchers {
 
-  class TestBoard extends Board {
+  class TestBoard extends BoardInterface {
     val height: Int = 6
     val width: Int = 7
     override def getCell(row: Int, col: Int): String = " "
@@ -22,8 +23,8 @@ class MainGUISpec extends AnyWordSpec with Matchers {
 
     "initialize with default components and window settings" in {
       val board = new TestBoard
-      val controller = new GameController(board)
-      val gui = new MainGUI(controller)
+      val gc = controller.GameControllerFactory.createControlller(board)
+      val gui = new MainGUI(gc)
 
       gui.title should be("Connect X")
       gui.player1Field.text should be("")
@@ -33,8 +34,8 @@ class MainGUISpec extends AnyWordSpec with Matchers {
 
     "correctly read text fields and trigger state change when triggering PLAY button click" in {
       val board = new TestBoard
-      val controller = new GameController(board)
-      val gui = new MainGUI(controller)
+      val gc = controller.GameControllerFactory.createControlller(board)
+      val gui = new MainGUI(gc)
 
       gui.player1Field.text = "Alice"
       gui.player2Field.text = "Bob"
@@ -43,15 +44,15 @@ class MainGUISpec extends AnyWordSpec with Matchers {
 
       gui.reactions.apply(ButtonClicked(gui.playButton))
 
-      controller.getPlayer.name should be("Alice")
+      gc.getPlayer.name should be("Alice")
     }
 
     "correctly safe-guard components before cells array is fully built" in {
       val board = new TestBoard
-      val controller = new GameController(board)
-      controller.setupPlayers(("Alice", "X"), ("Bob", "O"))
+      val gc = controller.GameControllerFactory.createControlller(board)
+      gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
       
-      val gui = new MainGUI(controller)
+      val gui = new MainGUI(gc)
 
       gui.startGameUI()
 
@@ -62,11 +63,11 @@ class MainGUISpec extends AnyWordSpec with Matchers {
 
     "correctly process grid setup and color cell buttons after game starts" in {
       val board = new TestBoard
-      val controller = new GameController(board)
+      val gc = controller.GameControllerFactory.createControlller(board)
       
-      controller.setupPlayers(("Player1", "X"), ("Player2", "O"))
+      gc.setupPlayers(("Player1", "X"), ("Player2", "O"))
       
-      val gui = new MainGUI(controller)
+      val gui = new MainGUI(gc)
       gui.startGameUI()
 
       gui.cells(0)(0) should not be null

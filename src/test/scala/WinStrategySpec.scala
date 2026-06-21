@@ -3,10 +3,11 @@ package util
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import model.Board
+import model.BoardInterface
 
 class ConnectNStrategySpec extends AnyWordSpec with Matchers {
 
-  class MockBoard extends Board {
+  class MockBoard extends BoardInterface {
     val matrix: Array[Array[String]] = Array.fill(6, 7)(" ")
     
     val height: Int = 6

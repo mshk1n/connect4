@@ -6,7 +6,7 @@ import scala.swing.event._
 import scala.util.{Success, Failure}
 import java.awt.event.ActionEvent
 
-class MainGUI(controller: GameController) extends MainFrame with Observer:
+class MainGUI(controller: GameControllerInterface) extends MainFrame with Observer:
   controller.add(this)
   val cells = Array.ofDim[Button](6, 7)
 
@@ -183,7 +183,7 @@ class MainGUI(controller: GameController) extends MainFrame with Observer:
 
     for (row <- 0 until 6) {
       for (col <- 0 until 7) {
-        val cellState = controller.board.getCell(row, col)
+        val cellState = controller.getBoard.getCell(row, col)
         val button = cells(row)(col)
 
         cellState match {

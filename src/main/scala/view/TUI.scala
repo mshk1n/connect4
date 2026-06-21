@@ -5,7 +5,7 @@ import util.ConsoleColors
 import scala.util.{Success, Failure}
 import scala.io.StdIn.readLine
 
-class TUI(gc: GameController) extends Observer:
+class TUI(gc: GameControllerInterface) extends Observer:
   //add controller to observer list
   gc.add(this)
 
