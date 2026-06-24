@@ -1,11 +1,14 @@
 package model
 
 trait BoardInterface:
+  def rows: Int
+  def cols: Int
   def render(): String
   def getCell(row: Int, col: Int): String
   def dropChip(col: Int, symbol: String): Option[(Int, Int)]
   def isFull: Boolean
   def removeChip(row: Int, col: Int): Unit
+  def setCell(row: Int, col: Int, value: String): Unit
 
 class Board() extends BoardInterface:
   val rows = 6
@@ -48,6 +51,11 @@ class Board() extends BoardInterface:
   def removeChip(row: Int, col: Int): Unit =
     if (row >= 0 && row < rows && col >= 0 && col < cols) then
       grid(row)(col) = " "
+    
+  def setCell(row: Int, col: Int, value: String): Unit =
+    if (row >= 0 && row < rows && col >= 0 && col < cols) {
+      grid(row)(col) = value
+    }
 
 object BoardFactory:
   def createBoard(): BoardInterface = new Board()

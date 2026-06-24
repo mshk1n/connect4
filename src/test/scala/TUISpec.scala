@@ -5,11 +5,13 @@ import org.scalatest.matchers.should.Matchers
 import controller.GameController
 import model.Board
 import java.io.ByteArrayOutputStream
+import fileio.FileIOInterface
 
 class TUISpec extends AnyWordSpec with Matchers {
   "A TUI" should {
     val board = model.BoardFactory.createBoard()
-    val gc = controller.GameControllerFactory.createControlller(board)
+    val fileIO: FileIOInterface = null.asInstanceOf[FileIOInterface]
+    val gc = controller.GameControllerFactory.createControlller(board, fileIO)
     gc.setupPlayers(("P1", "X"), ("P2", "O"))
     val tui = new TUI(gc)
 

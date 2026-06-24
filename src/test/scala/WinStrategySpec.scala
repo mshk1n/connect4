@@ -12,7 +12,10 @@ class ConnectNStrategySpec extends AnyWordSpec with Matchers {
     
     val height: Int = 6
     val width: Int = 7
+    override def cols: Int = width
+    override def rows: Int = height
     override def getCell(row: Int, col: Int): String = matrix(row)(col)
+    override def setCell(row: Int, col: Int, value: String): Unit = matrix(row)(col) = value
     override def dropChip(col: Int, symbol: String): Option[(Int, Int)] = None
     override def removeChip(row: Int, col: Int): Unit = {}
     override def isFull: Boolean = false

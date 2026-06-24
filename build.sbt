@@ -12,7 +12,9 @@ lazy val root = project
       "org.scalatest" %% "scalatest" % "3.2.14" % "test",
       "org.scalameta" %% "munit" % "1.2.4" % Test,
       "org.scala-lang.modules" %% "scala-swing" % "3.0.0",
-      "com.google.inject" % "guice" % "7.0.0"
+      "com.google.inject" % "guice" % "7.0.0",
+      "org.scala-lang.modules" %% "scala-xml" % "2.4.0",
+      "org.playframework" %% "play-json" % "3.0.4"
     ),
     strykerIsSupported := true
   )

@@ -4,8 +4,9 @@ import model.BoardInterface
 
 trait WinStrategy:
     def checkWin(board: BoardInterface, row: Int, col: Int): Boolean
+    def winCount: Int
 
-class ConnectNStrategy(winCount: Int) extends WinStrategy:
+class ConnectNStrategy(val winCount: Int) extends WinStrategy:
     override def checkWin(board: BoardInterface, row: Int, col: Int): Boolean =
         val symbol = board.getCell(row, col)
         if (symbol == " ") 

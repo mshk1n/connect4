@@ -4,6 +4,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers
 import model.Board
 import scala.util.{Success, Failure}
+import fileio.FileIOInterface
 
 class GameControllerSpec extends AnyWordSpec with Matchers {
 
@@ -11,14 +12,16 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
 
     "properly setup players" in {
       val board = model.BoardFactory.createBoard()
-      val gc = new GameController(board)
+      val fileIO: FileIOInterface = null.asInstanceOf[FileIOInterface]
+      val gc = controller.GameControllerFactory.createControlller(board, fileIO)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
       gc.getPlayer.name shouldBe "Alice"
     }
 
     "manage current player index correctly on successful moves" in {
       val board = model.BoardFactory.createBoard()
-      val gc = new GameController(board)
+      val fileIO: FileIOInterface = null.asInstanceOf[FileIOInterface]
+      val gc = controller.GameControllerFactory.createControlller(board, fileIO)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
       
       gc.makeMove(0) shouldBe Success(())
@@ -30,7 +33,8 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
 
     "not switch player and return Failure if move was invalid (column full)" in {
       val board = model.BoardFactory.createBoard()
-      val gc = new GameController(board)
+      val fileIO: FileIOInterface = null.asInstanceOf[FileIOInterface]
+      val gc = controller.GameControllerFactory.createControlller(board, fileIO)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
 
       for (_ <- 0 until 6) {
@@ -44,7 +48,8 @@ class GameControllerSpec extends AnyWordSpec with Matchers {
 
     "return Failure when attempting a move after the game is over" in {
       val board = model.BoardFactory.createBoard()
-      val gc = new GameController(board)
+      val fileIO: FileIOInterface = null.asInstanceOf[FileIOInterface]
+      val gc = controller.GameControllerFactory.createControlller(board, fileIO)
       gc.setupPlayers(("Alice", "X"), ("Bob", "O"))
 
       gc.makeMove(0) // A

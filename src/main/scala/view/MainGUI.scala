@@ -52,6 +52,9 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
   val undoButton = new Button("UNDO") { preferredSize = new java.awt.Dimension(80, 25) }
   val redoButton = new Button("REDO") { preferredSize = new java.awt.Dimension(80, 25) }
 
+  val saveButton = new Button("SAVE") { preferredSize = new java.awt.Dimension(80, 25) }
+  val loadButton = new Button("LOAD") { preferredSize = new java.awt.Dimension(80, 25) }
+
   contents = new BoxPanel(Orientation.Vertical) {
     border = Swing.EmptyBorder(15, 15, 15, 15)
     
@@ -73,7 +76,7 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
     contents += new FlowPanel(playButton)
   }
 
-  listenTo(playButton, undoButton, redoButton, radio3, radio4, radio5)
+  listenTo(playButton, undoButton, redoButton, radio3, radio4, radio5, saveButton, loadButton)
   reactions += {
     case ButtonClicked(`playButton`) =>
       if (player1Field.text.trim.isEmpty || player2Field.text.trim.isEmpty) then
@@ -110,6 +113,22 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
           Dialog.showMessage(parent = this, message = ex.getMessage, title = "Notice")
           print(s"[DEBUG] Redo failed! ${ex.getMessage()}")
       } 
+
+    case ButtonClicked(`saveButton`) =>
+      controller.save match {
+        case Success(_) => 
+          Dialog.showMessage(parent = this, message = "Successfully saved!", title = "Success!")
+        case Failure(ex) =>
+          Dialog.showMessage(parent = this, message = s"Saving failed! ${ex.getMessage()}", title = "Error!") 
+      }
+    
+    case ButtonClicked(`loadButton`) =>
+      controller.load match {
+        case Success(_) => 
+          Dialog.showMessage(parent = this, message = "Successfully loaded!", title = "Success!")
+        case Failure(ex) =>
+          Dialog.showMessage(parent = this, message = s"Loading failed! ${ex.getMessage()}", title = "Error!") 
+      }
   }
 
   
@@ -162,6 +181,10 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
         contents += undoButton
         contents += Swing.HStrut(5)
         contents += redoButton
+        contents += Swing.HStrut(30)
+        contents += saveButton
+        contents += Swing.HStrut(5)
+        contents += loadButton
       }) = BorderPanel.Position.North
       layout(gridPanel) = BorderPanel.Position.Center
     }
