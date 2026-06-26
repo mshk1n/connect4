@@ -9,7 +9,7 @@ class ConnectXModule extends AbstractModule {
     override def configure(): Unit = {
         bind(classOf[BoardInterface]).to(classOf[Board])
         bind(classOf[GameControllerInterface]).to(classOf[GameController])
-        bind(classOf[FileIOInterface]).to(classOf[FileIOXML])
-        //bind(classOf[FileIOInterface]).to(classOf[FileIOJSON])
+        //bind(classOf[FileIOInterface]).to(classOf[FileIOXML])
+        bind(classOf[FileIOInterface]).to(classOf[FileIOJSON])
     }
 }

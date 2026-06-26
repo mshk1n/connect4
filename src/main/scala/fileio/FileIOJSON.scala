@@ -50,7 +50,6 @@ class FileIOJSON extends FileIOInterface {
   override def load: Try[(BoardInterface, List[Player], GameState, Int)] = Try {
     val file = new java.io.File(filename)
     
-    // Считываем строку из файла и парсим в JsValue
     val source = scala.io.Source.fromFile(file)
     val jsonString = source.getLines().mkString
     source.close()

@@ -28,6 +28,7 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
   val turnLabel = new Label() {
     font = new java.awt.Font("Arial", java.awt.Font.BOLD, 14)
   }
+  val strategyLabel = new Label("")
 
   val titleLabel = new Label("Welcome to Connect X!")
   val player1Field = new TextField { columns = 15; preferredSize = new java.awt.Dimension(180, 26) }
@@ -133,8 +134,12 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
 
   
   def startGameUI(): Unit = {
-    this.preferredSize = new java.awt.Dimension(700, 550)
+    this.preferredSize = new java.awt.Dimension(700, 700)
     turnLabel.text = s"${controller.getPlayer.name}'s move >>> "
+    val initialWinCount = if (radio3.selected) "3 IN A ROW"
+                          else if (radio5.selected) "5 IN A ROW"
+                          else "4 IN A ROW"
+    strategyLabel.text = s"<html>Current mode: <b>$initialWinCount</b></html>"
     val gridPanel = new GridPanel(6, 7) {
       hGap = 5
       vGap = 5
@@ -165,27 +170,36 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
       }
     }
 
+    gridPanel.border = Swing.EmptyBorder(20, 40, 20, 40)
+
+    val infoRow = new FlowPanel {
+      contents += strategyLabel
+      contents += Swing.HStrut(40)
+      contents += timerLabel
+      contents += Swing.HStrut(40)
+      contents += turnLabel
+    }
+
+    val actionRow = new FlowPanel {
+      contents += undoButton
+      contents += Swing.HStrut(5)
+      contents += redoButton
+      contents += Swing.HStrut(40)
+      contents += saveButton
+      contents += Swing.HStrut(5)
+      contents += loadButton
+    }
+
+    val topControlPanel = new BoxPanel(Orientation.Vertical) {
+      contents += Swing.VStrut(10)
+      contents += infoRow
+      contents += Swing.VStrut(5)
+      contents += actionRow
+      contents += Swing.VStrut(10)
+    }
+
     val mainGamePanel = new BorderPanel {
-      layout(new FlowPanel {
-        if (radio3.selected)
-          contents += new Label("Current mode: 3 IN A ROW")
-        else if (radio5.selected)
-          contents += new Label("Current mode: 5 IN A ROW")
-        else
-          contents += new Label("Current mode: 4 IN A ROW")
-        contents += Swing.HStrut(30)
-        contents += timerLabel
-        contents += Swing.HStrut(30)
-        contents += turnLabel
-        contents += Swing.HStrut(30)
-        contents += undoButton
-        contents += Swing.HStrut(5)
-        contents += redoButton
-        contents += Swing.HStrut(30)
-        contents += saveButton
-        contents += Swing.HStrut(5)
-        contents += loadButton
-      }) = BorderPanel.Position.North
+      layout(topControlPanel) = BorderPanel.Position.North
       layout(gridPanel) = BorderPanel.Position.Center
     }
 
@@ -198,11 +212,26 @@ class MainGUI(controller: GameControllerInterface) extends MainFrame with Observ
   this.pack()
   this.centerOnScreen()
 
+  def updateModeLabelText(): Unit = {
+    val winCount = if (controller.getWinStrategy != null) {
+      controller.getWinStrategy.winCount
+    } else if (radio3.selected) {
+      3
+    } else if (radio5.selected) {
+      5
+    } else {
+      4
+    }
+    val modeText = s"$winCount IN A ROW"
+    strategyLabel.text = s"<html>Current mode: <b>$modeText</b></html>"
+  }
+
   override def update(): Unit = {
     val p1Symbol = controller.getPlayerSymbol(0)
     val p2Symbol = controller.getPlayerSymbol(1)
     val currentPlayer = controller.getPlayer
     turnLabel.text = s"${currentPlayer.name}'s move >>> "
+    updateModeLabelText()
 
     for (row <- 0 until 6) {
       for (col <- 0 until 7) {
