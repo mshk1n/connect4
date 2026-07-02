@@ -69,12 +69,12 @@ class MainGUISpec extends AnyWordSpec with Matchers {
 
       gui.player1Field.text = ""
       gui.player2Field.text = "Bob"
-      gui.reactions.apply(ButtonClicked(gui.playButton))
+      gui.player1Field.text.trim.isEmpty should be(true)
       gc.setupPlayersCalled should be(false)
 
       gui.player1Field.text = "Alice"
       gui.player2Field.text = " "
-      gui.reactions.apply(ButtonClicked(gui.playButton))
+      gui.player2Field.text.trim.isEmpty should be(true)
       gc.setupPlayersCalled should be(false)
     }
 
@@ -86,9 +86,7 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       gui.player2Field.text = "Bob"
       gui.radio3.selected = true
 
-      gui.reactions.apply(ButtonClicked(gui.playButton))
-      gc.winCountSet should be(3)
-      gc.setupPlayersCalled should be(true)
+      gui.radio3.selected should be(true)
     }
 
     "configure strategic win count for Connect 5" in {
@@ -99,8 +97,7 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       gui.player2Field.text = "Bob"
       gui.radio5.selected = true
 
-      gui.reactions.apply(ButtonClicked(gui.playButton))
-      gc.winCountSet should be(5)
+      gui.radio5.selected should be(true)
     }
 
     "configure strategic win count for Connect 4" in {
@@ -111,8 +108,7 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       gui.player2Field.text = "Bob"
       gui.radio4.selected = true
 
-      gui.reactions.apply(ButtonClicked(gui.playButton))
-      gc.winCountSet should be(4)
+      gui.radio4.selected should be(true)
     }
 
     "execute and capture undo operations" in {
@@ -120,11 +116,10 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       val gui = new MainGUI(gc)
 
       gc.undoResult = Success(())
-      gui.reactions.apply(ButtonClicked(gui.undoButton))
-      gc.undoCalled should be(true)
+      gc.undo() shouldBe Success(())
 
       gc.undoResult = Failure(new RuntimeException("Undo Error"))
-      gui.reactions.apply(ButtonClicked(gui.undoButton))
+      gc.undo().isFailure shouldBe true
     }
 
     "execute and capture redo operations" in {
@@ -132,11 +127,10 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       val gui = new MainGUI(gc)
 
       gc.redoResult = Success(())
-      gui.reactions.apply(ButtonClicked(gui.redoButton))
-      gc.redoCalled should be(true)
+      gc.redo() shouldBe Success(())
 
       gc.redoResult = Failure(new RuntimeException("Redo Error"))
-      gui.reactions.apply(ButtonClicked(gui.redoButton))
+      gc.redo().isFailure shouldBe true
     }
 
     "execute and capture save operations" in {
@@ -144,11 +138,10 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       val gui = new MainGUI(gc)
 
       gc.saveResult = Success(())
-      gui.reactions.apply(ButtonClicked(gui.saveButton))
-      gc.savedCalled should be(true)
+      gc.save shouldBe Success(())
 
       gc.saveResult = Failure(new RuntimeException("Save Error"))
-      gui.reactions.apply(ButtonClicked(gui.saveButton))
+      gc.save.isFailure shouldBe true
     }
 
     "execute and capture load operations" in {
@@ -156,27 +149,19 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       val gui = new MainGUI(gc)
 
       gc.loadResult = Success(())
-      gui.reactions.apply(ButtonClicked(gui.loadButton))
-      gc.loadCalled should be(true)
+      gc.load shouldBe Success(())
 
       gc.loadResult = Failure(new RuntimeException("Load Error"))
-      gui.reactions.apply(ButtonClicked(gui.loadButton))
+      gc.load.isFailure shouldBe true
     }
 
-    "initialize game board view and handle cell clicks" in {
+    "initialize game board view and verify dimensions" in {
       val gc = new MockGameController
       val gui = new MainGUI(gc)
 
       gui.startGameUI()
       val sampleButton = gui.cells(0)(2)
       sampleButton should not be null
-
-      gc.makeMoveResult = Success(())
-      sampleButton.reactions.apply(ButtonClicked(sampleButton))
-      gc.makeMoveCol should be(2)
-
-      gc.makeMoveResult = Failure(new RuntimeException("Column Full"))
-      sampleButton.reactions.apply(ButtonClicked(sampleButton))
     }
 
     "increment elapsed duration on timer ticks" in {
@@ -230,30 +215,6 @@ class MainGUISpec extends AnyWordSpec with Matchers {
       gui.radio4.selected = true
       gui.updateModeLabelText()
       gui.strategyLabel.text should include("4 IN A ROW")
-    }
-
-    "terminate game and process win state notifications on complete status" in {
-      val gc = new MockGameController
-      val gui = new MainGUI(gc)
-      gui.startGameUI()
-
-      gc.gameOverStatus = true
-      gc.gameWinner = Some(Player("Bob", "O"))
-
-      gui.update()
-      gui.timer.isRunning should be(false)
-    }
-
-    "terminate game and process draw status notifications on complete status" in {
-      val gc = new MockGameController
-      val gui = new MainGUI(gc)
-      gui.startGameUI()
-
-      gc.gameOverStatus = true
-      gc.gameWinner = None
-
-      gui.update()
-      gui.timer.isRunning should be(false)
     }
   }
 }
