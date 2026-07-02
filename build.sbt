@@ -16,5 +16,6 @@ lazy val root = project
       "org.scala-lang.modules" %% "scala-xml" % "2.4.0",
       "org.playframework" %% "play-json" % "3.0.4"
     ),
-    strykerIsSupported := true
+    strykerIsSupported := true,
+    fork := true
   )
