@@ -17,5 +17,6 @@ lazy val root = project
       "org.playframework" %% "play-json" % "3.0.4"
     ),
     strykerIsSupported := true,
-    fork := true
+    fork := true,
+    coverageExcludedPackages := "mXconnect"
   )
